@@ -1,17 +1,60 @@
 /* Global resets — page-specific styles live in their own CSS files */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#f4f6f9;
 }
 
-body {
-  min-height: 100vh;
-  line-height: 1.5;
+.container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-img, video { max-width: 100%; display: block; }
-button { font-family: inherit; }
-a { color: inherit; }
+.card{
+  background:white;
+  padding:40px;
+  border-radius:10px;
+  width:350px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.title{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.input{
+  width:100%;
+  padding:10px;
+  margin-bottom:15px;
+  border:1px solid #ccc;
+  border-radius:5px;
+}
+
+.button{
+  width:100%;
+  padding:10px;
+  background:#4a6cf7;
+  border:none;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.button:hover{
+  background:#3451d1;
+}
+
+.link{
+  text-align:center;
+  margin-top:10px;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}

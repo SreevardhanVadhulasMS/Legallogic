@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import "./HomePage.css";
 
 // ─── Sub-components ────────────────────────────────────────────────────────
@@ -15,12 +16,13 @@ const Navbar = () => {
 
   return (
     <nav className={`navbar ${scrolled ? "navbar--stuck" : ""}`}>
-      <a className="nav-brand" href="#">
+
+      <Link className="nav-brand" to="/">
         <div className="brand-mark">LL</div>
         <span className="brand-name">
           Legal<strong>Logic</strong>
         </span>
-      </a>
+      </Link>
 
       <ul className={`nav-links ${menuOpen ? "nav-links--open" : ""}`}>
         {["Features", "Case Analysis", "Find Advisors", "Expenses"].map((item) => (
@@ -31,8 +33,15 @@ const Navbar = () => {
       </ul>
 
       <div className="nav-actions">
-        <button className="btn-ghost">Sign In</button>
-        <button className="btn-solid">Get Started →</button>
+
+        <Link to="/login">
+          <button className="btn-ghost">Sign In</button>
+        </Link>
+
+        <Link to="/signup">
+          <button className="btn-solid">Get Started →</button>
+        </Link>
+
         <button
           className="hamburger"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -40,6 +49,7 @@ const Navbar = () => {
         >
           <span /><span /><span />
         </button>
+
       </div>
     </nav>
   );
