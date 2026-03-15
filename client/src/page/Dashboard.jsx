@@ -1,130 +1,144 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import "./Dashboard.css";
 
-const Dashboard = () => {
+/* ─── All icons have explicit width + height ─────────────── */
+const SvgAI = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2a10 10 0 1 0 10 10H12z"/>
+    <path d="M12 6v6l3 3"/>
+    <circle cx="18.5" cy="5.5" r="2.5"/>
+  </svg>
+);
+const SvgViability = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+);
+const SvgAdvisors = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+const SvgExpense = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="1" x2="12" y2="23"/>
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </svg>
+);
+const SvgDoc = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+  </svg>
+);
+const SvgManage = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+    <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+    <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+  </svg>
+);
+const SvgArrow = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14M12 5l7 7-7 7"/>
+  </svg>
+);
+const SvgSignOut = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+const FEATURES = [
+  { Icon: SvgAI,        color: "#4f7fe8", title: "AI Legal Advice",   tech: "GPT-4 Turbo · RAG", path: "/ai-summary",      desc: "Jurisdiction-aware guidance across 14 legal domains — criminal, family, corporate, IP, employment — with structured answers instantly." },
+  { Icon: SvgViability, color: "#e87b4f", title: "Case Viability ML", tech: "ML Model v2.6",     path: "/recent-cases",    desc: "Trained on 200K+ outcomes. Analyses your facts, jurisdiction, evidence strength and gives a probability-based viability score." },
+  { Icon: SvgAdvisors,  color: "#e84f6e", title: "Nearby Advisors",   tech: "Live · Maps API",   path: "/find-advisors",   desc: "Discover and book verified legal professionals in your city. Filter by specialty, rating, availability and fee." },
+  { Icon: SvgExpense,   color: "#e8a74f", title: "Expense Tracker",   tech: "Multi-Currency",    path: "/expense-tracker", desc: "Track every legal cost — attorney fees, filings, expert witnesses, travel — with budget alerts and exportable PDF/CSV reports." },
+  { Icon: SvgDoc,       color: "#9b6fe8", title: "Document Analysis", tech: "OCR · NLD",         path: "/upload-case",     desc: "Upload contracts, FIRs, or agreements and receive instant AI analysis — key clauses, risk flags, obligations and plain-language summaries." },
+  { Icon: SvgManage,    color: "#4fb8e8", title: "Case Management",   tech: "E2E Encrypted",     path: "/case-management", desc: "Manage all cases in one encrypted dashboard — timelines, court dates, reminders, advisor notes and version-controlled document storage." },
+];
+
+export default function Dashboard() {
   const navigate = useNavigate();
-
-
-  const features = [
-    { icon: "📂", title: "Upload Case", desc: "Upload legal documents and analyze them using AI.", path: "/upload-case" },
-    { icon: "🤖", title: "AI Case Summary", desc: "Generate instant AI summaries for legal documents.", path: "/ai-summary" },
-    { icon: "📑", title: "Recent Cases", desc: "View your previously uploaded and analyzed cases.", path: "/recent-cases" },
-    { icon: "📍", title: "Find Advisors", desc: "Locate verified lawyers near your location.", path: "/find-advisors" },
-    { icon: "💰", title: "Expense Tracker", desc: "Track legal spending and maintain budgets.", path: "/expense-tracker" },
-    { icon: "🛡", title: "Case Management", desc: "Organize case timelines, documents and notes.", path: "/case-management" },
-  ];
 
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  const handleCardClick = (e, path) => {
-    // Ripple effect
-    const ripple = document.createElement("div");
-    ripple.className = "card-ripple";
-    const rect = e.currentTarget.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
-    ripple.style.width = ripple.style.height = size + "px";
-    ripple.style.left = x + "px";
-    ripple.style.top = y + "px";
-    e.currentTarget.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-
-    navigate(path);
-  };
-
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-show');
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("ll-in")),
+      { threshold: 0.04 }
+    );
+    document.querySelectorAll("[data-ll]").forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <div className="dashboard">
+    <div className="ll-wrap">
 
-      {/* Header */}
-      <header className="dashboard-header reveal" id="header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <a href="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong> - Dashboard
-            </span>
-          </a>
-          
+      {/* NAV */}
+      <nav className="ll-nav" data-ll>
+        <a href="/dashboard" className="ll-logo">Legal<em>Logic</em></a>
+        <div className="ll-nav-actions">
+          <button className="ll-cta" onClick={() => navigate("/ai-summary")}>Get started</button>
+          <button className="ll-ghost" onClick={logout}>
+            Sign out <SvgSignOut />
+          </button>
         </div>
-        <button className="logout-btn" onClick={logout}>
-          Logout →
-        </button>
+      </nav>
+
+      {/* INTRO */}
+      <header className="ll-intro" data-ll>
+        <p className="ll-label">Legal Intelligence Platform</p>
+        <h1 className="ll-h1">Your legal workspace,<br /><em>all in one place.</em></h1>
+        <p className="ll-desc">Six modules to upload, analyse, track and manage every case — from document AI to verified lawyer discovery.</p>
       </header>
 
-
-      {/* Welcome Card */}
-      <div className="welcome-card reveal" id="welcome">
-        <h2 className="welcome-title">Welcome back</h2>
-        <p className="welcome-text">
-          Manage your legal cases, analyze documents using AI, 
-          track expenses and connect with verified advisors — all in one place.
-        </p>
+      {/* GRID HEADER */}
+      <div className="ll-bar" data-ll>
+        <span>Platform modules</span>
+        <span>06</span>
       </div>
 
-
-      {/* Feature Cards */}
-      <div className="dashboard-grid reveal" id="grid">
-        {features.map((feature, index) => (
-          <div 
-            key={feature.path}
-            className="dashboard-card reveal" 
-            id={`card-${index}`}
-            onClick={(e) => handleCardClick(e, feature.path)}
+      {/* FEATURE CARDS */}
+      <div className="ll-grid">
+        {FEATURES.map((f, i) => (
+          <button
+            key={f.title}
+            className="ll-card"
+            style={{ "--c": f.color, "--d": `${i * 55}ms` }}
+            onClick={() => navigate(f.path)}
           >
-            <div className="dashboard-card-icon">{feature.icon}</div>
-            <h3 className="dashboard-card-title">{feature.title}</h3>
-            <p className="dashboard-card-desc">{feature.desc}</p>
-          </div>
+            <div className="ll-icon" style={{ "--c": f.color }}>
+              <f.Icon />
+            </div>
+            <h3 className="ll-card-h">{f.title}</h3>
+            <p className="ll-card-p">{f.desc}</p>
+            <div className="ll-card-footer">
+              <span className="ll-tag">{f.tech}</span>
+              <span className="ll-arr"><SvgArrow /></span>
+            </div>
+          </button>
         ))}
       </div>
 
-
-      {/* Recent Activity */}
-      <div className="activity-section reveal" id="activity">
-        <h2 className="activity-title">Recent Activity</h2>
-        <div className="activity-item">
-          <div className="activity-icon">📄</div>
-          <div className="activity-content">
-            <div className="activity-text">Case document uploaded</div>
-            <div className="activity-time">2 hours ago</div>
-          </div>
-        </div>
-        <div className="activity-item">
-          <div className="activity-icon">🤖</div>
-          <div className="activity-content">
-            <div className="activity-text">AI analysis completed</div>
-            <div className="activity-time">1 day ago</div>
-          </div>
-        </div>
-        <div className="activity-item">
-          <div className="activity-icon">💰</div>
-          <div className="activity-content">
-            <div className="activity-text">Added new expense</div>
-            <div className="activity-time">3 days ago</div>
-          </div>
-        </div>
-      </div>
+      {/* FOOTER */}
+      <footer className="ll-footer" data-ll>
+        <span className="ll-footer-logo">Legal<em>Logic</em></span>
+        <span>© 2025 · All rights reserved</span>
+      </footer>
 
     </div>
   );
-};
-
-export default Dashboard;
+}

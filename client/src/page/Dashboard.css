@@ -1,422 +1,340 @@
-/* ============================================================
-   LegalLogic Dashboard — Modern Homepage-inspired Theme
-   Cream/gold palette, animations, responsive cards-as-buttons
-   ============================================================ */
+/* ================================================================
+   LegalLogic Dashboard  ·  Dark Gray Professional
+   All classes prefixed ll-  |  Instrument Serif + Geist
+   ================================================================ */
 
-/* Fonts loaded globally in index.css */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap');
 
-/* ─── CSS Variables (matches Homepage light theme) ──────── */
-:root {
---bg:        #f7f2e8;
-  --deep:      #f0ebdf;
-  --surface:   #e9e2d6;
-  --card:      #fdfcfb;
-  --card2:     #fcf9f4;
-  --border:    rgba(154, 119, 6, 0.18);
-  --border2:   rgba(0, 0, 0, 0.1);
-  --gold:      #d97706;
-  --gold-lt:   #f59e0b;
-  --hover-gold: #eab308;
-  --gold-glow: #fbbf24;
-  --gold-dim:  rgba(217, 119, 6, 0.3);
-  --cream:     #0f0d09;
-  --muted:     #5a5548;
-  --text:      #0f0d09;
-  --blue:      #2563eb;
-  --teal:      #0d9488;
-  --rose:      #dc2626;
-  --violet:    #7c3aed;
-  --green:     #059669;
-  --shadow-card:  0 12px 40px rgba(0, 0, 0, 0.1);
-  --shadow-sm:    0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-/* ─── Base ───────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  font-weight: 300;
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-/* ─── Dashboard Wrapper ──────────────────────────────────── */
-.dashboard {
+/* ── Hard reset scoped to wrapper ─────────────────────────── */
+.ll-wrap {
+  all: initial;
+  display: block;
   min-height: 100vh;
-  padding: 2rem 4rem;
-  max-width: 1400px;
+  background: #111214;
+  color: #e4e4e6;
+  font-family: 'Geist', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  padding: 0 2.5rem 4rem;
+  max-width: 1240px;
   margin: 0 auto;
-  background: var(--bg);
-  position: relative;
-  scroll-margin-top: 80px;
 }
 
-.dashboard > * {
-  scroll-margin-top: 100px;
+.ll-wrap *, .ll-wrap *::before, .ll-wrap *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* ─── Header (Homepage navbar-inspired) ──────────────────── */
-.dashboard-header {
+/* make the html/body background match */
+body { background: #111214 !important; }
+
+/* ── Reveal animation ─────────────────────────────────────── */
+[data-ll] {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+[data-ll].ll-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+.ll-nav {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  position: relative;
+  height: 54px;
+  border-bottom: 1px solid #222226;
+  margin-bottom: 2.75rem;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.ll-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.15rem;
+  font-style: normal;
+  color: #e4e4e6;
   text-decoration: none;
 }
+.ll-logo em { font-style: italic; color: #666670; }
 
-.brand-mark {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(140deg, var(--gold), var(--gold-lt));
+.ll-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.ll-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  background: #e4e4e6;
+  border: none;
+  color: #111214;
+  font-family: 'Geist', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: 0.01em;
+}
+.ll-cta:hover { background: #ffffff; }
+
+.ll-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: transparent;
+  border: 1px solid #28282e;
+  color: #666670;
+  font-family: 'Geist', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.ll-ghost:hover { color: #e4e4e6; border-color: #3c3c44; }
+
+/* ── INTRO ────────────────────────────────────────────────── */
+.ll-intro {
+  max-width: 580px;
+  margin-bottom: 3rem;
+}
+
+.ll-label {
+  font-size: 0.67rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #444450;
+  margin-bottom: 0.875rem;
+}
+
+.ll-h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.875rem, 3.25vw, 2.625rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #e4e4e6;
+  margin-bottom: 0.875rem;
+}
+.ll-h1 em { font-style: italic; color: #666670; }
+
+.ll-desc {
+  font-size: 0.9rem;
+  color: #666670;
+  line-height: 1.72;
+  font-weight: 300;
+}
+
+/* ── GRID HEADER BAR ──────────────────────────────────────── */
+.ll-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #1c1c20;
+  margin-bottom: 1px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #3e3e46;
+}
+
+/* ── GRID ─────────────────────────────────────────────────── */
+.ll-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #1c1c20;
+  border: 1px solid #1c1c20;
+  border-radius: 13px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+
+/* ── CARD ─────────────────────────────────────────────────── */
+.ll-card {
+  /* reset button */
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  outline: none;
+  /* layout */
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.875rem 1.75rem 1.625rem;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: #161619;
+  font-family: 'Geist', sans-serif;
+  /* staggered entrance */
+  animation: ll-up 0.45s ease both;
+  animation-delay: var(--d, 0ms);
+  transition: background 0.18s ease;
+}
+
+@keyframes ll-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.ll-card:hover { background: #1b1b1f; }
+
+/* colour strip bottom */
+.ll-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--c, #555);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.ll-card:hover::after { transform: scaleX(1); }
+
+/* ── Icon ─────────────────────────────────────────────────── */
+.ll-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  max-width: 46px;
+  max-height: 46px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: white;
-}
-
-.brand-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.25rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.brand-name strong {
-  color: var(--gold);
-}
-
-.logout-btn {
-  padding: 0.75rem 1.5rem;
-  background: var(--gold);
-  border: none;
-  color: white;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 500;
-  transition: all 0.25s ease;
-}
-
-.logout-btn:hover {
-  background: var(--gold-lt);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px var(--gold-dim);
-}
-
-/* ─── Dashboard Title ────────────────────────────────────── */
-.dashboard-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  background: linear-gradient(135deg, var(--text) 0%, var(--gold) 50%, var(--gold-lt) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-}
-
-.dashboard-subtitle {
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-/* ─── Welcome Card ──────────────────────────────────────── */
-.welcome-card {
-  background: linear-gradient(135deg, var(--card2) 0%, color-mix(in srgb, var(--gold) 3%, var(--card2)) 100%);
-  padding: 2.5rem;
-  border-radius: 1rem;
-  margin-bottom: 3rem;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  animation: fadeup 0.8s ease-out;
-}
-
-.welcome-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
-  color: var(--text);
-}
-
-.welcome-text {
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1.7;
-}
-
-/* ─── Cards Grid (Homepage feat-grid inspired) ───────────── */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 3rem;
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
   overflow: hidden;
-  background: var(--card);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  padding: 1rem;
+  background: color-mix(in srgb, var(--c) 14%, #161619);
+  border: 1px solid color-mix(in srgb, var(--c) 24%, transparent);
+  color: var(--c);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.ll-card:hover .ll-icon { transform: scale(1.07); }
+
+/* lock SVG inside icon — the critical fix */
+.ll-icon svg {
+  display: block;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  flex-shrink: 0;
 }
 
-.dashboard-card {
-  padding: 2.5rem 2rem;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  background: var(--card);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-}
-
-.dashboard-card:nth-child(2),
-.dashboard-card:nth-child(5),
-.dashboard-card:nth-child(8) {
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-}
-
-.dashboard-card:nth-child(4),
-.dashboard-card:nth-child(5),
-.dashboard-card:nth-child(6),
-.dashboard-card:nth-child(7),
-.dashboard-card:nth-child(8),
-.dashboard-card:nth-child(9) {
-  border-top: 1px solid var(--border);
-}
-
-.dashboard-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: 0 25px 60px rgba(217, 119, 6, 0.4), 0 0 0 1px var(--hover-gold);
-}
-
-.dashboard-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--surface), color-mix(in srgb, var(--gold) 20%, white));
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: 0;
-}
-
-.dashboard-card:hover::before {
-  opacity: 1;
-}
-
-.dashboard-card-icon {
-  font-size: 2.75rem;
-  z-index: 1;
-  padding: 0.75rem;
-  border-radius: 0.875rem;
-  position: relative;
-}
-
-.dashboard-card:nth-child(1) .dashboard-card-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: white; }
-.dashboard-card:nth-child(2) .dashboard-card-icon { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
-.dashboard-card:nth-child(3) .dashboard-card-icon { background: linear-gradient(135deg, #06b6d4, #22d3ee); color: white; }
-.dashboard-card:nth-child(4) .dashboard-card-icon { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; }
-.dashboard-card:nth-child(5) .dashboard-card-icon { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
-.dashboard-card:nth-child(6) .dashboard-card-icon { background: linear-gradient(135deg, var(--gold), var(--gold-lt)); color: white; }
-
-.dashboard-card-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.75rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--hover-gold), var(--gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  z-index: 1;
-  margin: 0;
+/* ── Card text ────────────────────────────────────────────── */
+.ll-card-h {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: #e4e4e6;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
-.dashboard-card-desc {
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  z-index: 1;
-}
-
-.card-ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(154, 111, 30, 0.15);
-  transform: scale(0);
-  animation: ripple 0.6s linear;
-  pointer-events: none;
-  z-index: 2;
-}
-
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-/* ─── Recent Activity ───────────────────────────────────── */
-.activity-section {
-  background: var(--card);
-  padding: 2rem;
-  border-radius: 1rem;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-
-.activity-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.75rem;
-  margin-bottom: 1.5rem;
-  color: var(--text);
-}
-
-.activity-item {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.activity-item:last-child {
-  border-bottom: none;
-}
-
-.activity-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.5rem;
-  background: var(--gold-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
-
-.activity-content {
+.ll-card-p {
+  font-size: 0.845rem;
+  color: #666670;
+  line-height: 1.72;
+  font-weight: 300;
   flex: 1;
 }
 
-.activity-text {
-  color: var(--text);
+/* ── Card footer ──────────────────────────────────────────── */
+.ll-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  margin-top: auto;
+}
+
+.ll-tag {
+  font-size: 0.67rem;
   font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #444450;
+  background: #1c1c20;
+  border: 1px solid #26262c;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
 }
 
-.activity-time {
-  color: var(--muted);
-  font-size: 0.875rem;
+.ll-arr {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  border: 1px solid #26262c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444450;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: color 0.18s, border-color 0.18s, transform 0.18s;
+}
+/* lock arrow SVG */
+.ll-arr svg {
+  display: block;
+  width: 13px !important;
+  height: 13px !important;
+  flex-shrink: 0;
+}
+.ll-card:hover .ll-arr {
+  color: #e4e4e6;
+  border-color: #3c3c44;
+  transform: translate(2px, -2px);
 }
 
-/* ─── Animations ────────────────────────────────────────── */
-@keyframes fadeup {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── FOOTER ───────────────────────────────────────────────── */
+.ll-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1c1c20;
+  font-size: 0.72rem;
+  color: #3e3e46;
+  letter-spacing: 0.04em;
 }
 
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ll-footer-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 0.95rem;
+  color: #3e3e46;
+}
+.ll-footer-logo em { font-style: italic; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1020px) {
+  .ll-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .ll-wrap { padding: 0 1.25rem 3rem; }
+  .ll-grid { grid-template-columns: 1fr; }
+  .ll-h1 { font-size: 1.75rem; }
 }
 
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.75s ease;
-  animation: fadeup 0.8s ease-out forwards;
-}
-
-/* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .dashboard {
-    padding: 1.5rem 2rem;
-  }
-  
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 1rem;
-  }
-  
-  .dashboard-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .dashboard-card {
-    padding: 2rem 1.5rem;
-  }
-  
-  .welcome-card {
-    padding: 2rem 1.5rem;
-  }
-  
-  .activity-section {
-    padding: 1.5rem;
-  }
-}
-
-/* ─── Scrollbar ─────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--surface);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--gold-dim);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-lt);
-}
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #111214; }
+::-webkit-scrollbar-thumb { background: #28282e; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3c3c44; }
