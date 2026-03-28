@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import "./HomePage.css";
+import "./Homepage.css";
 
 /* ─── Navbar ────────────────────────────────────────────────────── */
 const Navbar = () => {

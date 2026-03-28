@@ -29,8 +29,8 @@ function Signup() {
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
-    } catch {
-      setError("Signup failed");
+    } catch (err) {
+      setError(err.response?.data?.message || "Signup failed");
     }
   };
 

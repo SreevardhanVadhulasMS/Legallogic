@@ -1,194 +1,72 @@
-import { Link, useNavigate } from "react-router-dom";
-import "../page/Dashboard.css";
+import { Link } from "react-router-dom";
+import "./Dashboard.css";
+import useReveal from "../hooks/useReveal";
 
 const RecentCases = () => {
-  const navigate = useNavigate();
+  useReveal();
 
   const cases = [
-    {
-      id: "#CASE-001",
-      title: "Contract Dispute - Equity Vesting",
-      status: "analysis-complete",
-      date: "2025-01-15",
-      advisor: "Ravi Sharma",
-      viability: 78,
-      nextAction: "Send Legal Notice"
-    },
-    {
-      id: "#CASE-002",
-      title: "Wrongful Termination Claim",
-      status: "needs-documents",
-      date: "2025-01-12",
-      advisor: "Priya Krishnan", 
-      viability: 62,
-      nextAction: "Upload Termination Letter"
-    },
-    {
-      id: "#CASE-003",
-      title: "Rental Agreement Dispute",
-      status: "advisor-assigned",
-      date: "2025-01-10",
-      advisor: "Ananya Mehta",
-      viability: 89,
-      nextAction: "Court Filing Scheduled"
-    },
-    {
-      id: "#CASE-004",
-      title: "IP Infringement Notice",
-      status: "in-progress",
-      date: "2025-01-08",
-      advisor: null,
-      viability: null,
-      nextAction: "AI Analysis Pending"
-    }
+    { id: "#CASE-001", title: "Contract Dispute - Equity Vesting",  status: "analysis-complete", date: "2025-01-15", advisor: "Ravi Sharma",    viability: 78,   nextAction: "Send Legal Notice"         },
+    { id: "#CASE-002", title: "Wrongful Termination Claim",          status: "needs-documents",   date: "2025-01-12", advisor: "Priya Krishnan", viability: 62,   nextAction: "Upload Termination Letter" },
+    { id: "#CASE-003", title: "Rental Agreement Dispute",            status: "advisor-assigned",  date: "2025-01-10", advisor: "Ananya Mehta",   viability: 89,   nextAction: "Court Filing Scheduled"   },
+    { id: "#CASE-004", title: "IP Infringement Notice",              status: "in-progress",       date: "2025-01-08", advisor: null,             viability: null, nextAction: "AI Analysis Pending"      }
   ];
-
-  const getStatusColor = (status) => {
-    const colors = {
-      "analysis-complete": "var(--green)",
-      "advisor-assigned": "var(--teal)", 
-      "in-progress": "var(--gold)",
-      "needs-documents": "var(--rose)"
-    };
-    return colors[status] || "var(--muted)";
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  const logout = () => { localStorage.removeItem("token"); window.location.href = "/login"; };
 
   return (
-    <div className="dashboard" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-      {/* Header */}
-      <header className="dashboard-header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <Link to="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong> - Recent Cases
-            </span>
-          </Link>
-          
+    <div className="ll-wrap">
+      <nav className="ll-nav ll-reveal" data-ll>
+        <Link to="/dashboard" className="ll-page-back">← Back to Dashboard</Link>
+        <div className="ll-nav-actions">
+          <Link to="/upload-case" className="ll-cta">➕ New Case</Link>
+          <button className="ll-ghost" onClick={logout}>Sign out</button>
         </div>
-        <button className="logout-btn" onClick={logout}>Logout →</button>
+      </nav>
+
+      <header className="ll-page-header ll-reveal" data-ll>
+        <h1 className="ll-page-title">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pur)" strokeWidth="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Recent Cases
+        </h1>
       </header>
 
-      {/* Filters & Stats */}
-      <div className="dashboard-grid" style={{ gridTemplateColumns: "2fr 1fr 1fr 1fr", marginBottom: "2rem" }}>
-        <div className="dashboard-card" style={{ padding: "1.5rem", textAlign: "left" }}>
-          <input 
-            type="text" 
-            placeholder="Search cases by title, ID, or advisor..."
-            style={{
-              width: "100%", padding: "0.75rem 1rem", border: "1px solid var(--border)",
-              borderRadius: "0.5rem", background: "var(--surface)", fontSize: "1rem"
-            }}
-          />
-        </div>
-        <div className="dashboard-card" style={{ textAlign: "center" }}>
-          <h3 style={{ fontSize: "1.3rem" }}>4 Active</h3>
-          <p>All Cases</p>
-        </div>
-        <div className="dashboard-card" style={{ textAlign: "center" }}>
-          <h3 style={{ fontSize: "1.3rem", color: "var(--green)" }}>2 Complete</h3>
-          <p>Analysis Ready</p>
-        </div>
-        <div className="dashboard-card" style={{ textAlign: "center" }}>
-          <h3 style={{ fontSize: "1.3rem", color: "var(--rose)" }}>1 Pending</h3>
-          <p>Needs Action</p>
-        </div>
+      <div className="ll-data-stats ll-reveal" data-ll>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">4</span><span className="ll-data-stat-l">Active Cases</span></div>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">78%</span><span className="ll-data-stat-l">Avg Viability</span></div>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">2</span><span className="ll-data-stat-l">Ready to Proceed</span></div>
       </div>
 
-      {/* Cases Table */}
-      <div className="activity-section" style={{ borderRadius: "1rem", overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "var(--surface)" }}>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontWeight: "600", color: "var(--text)" }}>Case ID</th>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontWeight: "600", color: "var(--text)" }}>Title</th>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontWeight: "600", color: "var(--text)" }}>Status</th>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "center", fontWeight: "600", color: "var(--text)" }}>Viability</th>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "center", fontWeight: "600", color: "var(--text)" }}>Advisor</th>
-              <th style={{ padding: "1rem 1.5rem", textAlign: "center", fontWeight: "600", color: "var(--text)" }}>Next Action</th>
-              <th style={{ padding: "1rem 0.5rem", width: "80px" }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {cases.map((caseItem, index) => (
-              <tr key={caseItem.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                <td style={{ padding: "1.25rem 1.5rem", fontFamily: "'JetBrains Mono', monospace", color: "var(--gold)" }}>
-                  {caseItem.id}
-                </td>
-                <td style={{ padding: "1.25rem 1.5rem" }}>
-                  <div style={{ fontWeight: "500", marginBottom: "0.25rem" }}>{caseItem.title}</div>
-                  <div style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{caseItem.date}</div>
-                </td>
-                <td style={{ padding: "1.25rem 1.5rem" }}>
-                  <span style={{
-                    background: `color-mix(in srgb, ${getStatusColor(caseItem.status)} 12%, transparent)`,
-                    color: getStatusColor(caseItem.status),
-                    padding: "0.25rem 0.75rem",
-                    borderRadius: "20px",
-                    fontSize: "0.8rem",
-                    fontFamily: "'JetBrains Mono', monospace"
-                  }}>
-                    {caseItem.status.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}
-                  </span>
-                </td>
-                <td style={{ padding: "1.25rem 1.5rem", textAlign: "center" }}>
-                  {caseItem.viability ? (
-                    <div style={{ 
-                      fontFamily: "'JetBrains Mono', monospace", 
-                      fontSize: "1.1rem", 
-                      color: "var(--gold)",
-                      fontWeight: "600"
-                    }}>
-                      {caseItem.viability}%
-                    </div>
-                  ) : (
-                    <span style={{ color: "var(--muted)" }}>-</span>
-                  )}
-                </td>
-                <td style={{ padding: "1.25rem 1.5rem", textAlign: "center" }}>
-                  {caseItem.advisor || <span style={{ color: "var(--muted)" }}>-</span>}
-                </td>
-                <td style={{ padding: "1.25rem 1.5rem", textAlign: "center" }}>
-                  <div style={{ fontWeight: "500", color: "var(--text)" }}>{caseItem.nextAction}</div>
-                </td>
-                <td style={{ padding: "1.25rem 0.5rem", textAlign: "center" }}>
-                  <Link to={`/case/${caseItem.id.replace("#", "")}`} style={{ 
-                    padding: "0.5rem 1rem",
-                    background: "var(--gold)",
-                    color: "white",
-                    textDecoration: "none",
-                    borderRadius: "0.375rem",
-                    fontSize: "0.85rem",
-                    fontWeight: "500"
-                  }}>
-                    View
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Action Bar */}
-      <div style={{ textAlign: "center", marginTop: "3rem" }}>
-        <Link to="/upload-case">
-          <button className="logout-btn" style={{ background: "var(--blue)", marginRight: "1rem" }}>
-            ➕ New Case
-          </button>
-        </Link>
-        <Link to="/dashboard">
-          <button className="logout-btn" style={{ background: "var(--muted)" }}>← Dashboard</button>
-        </Link>
+      <div className="ll-data-grid ll-reveal" data-ll>
+        {cases.map((c) => (
+          <div key={c.id} className="ll-data-card">
+            <div className="ll-data-meta">
+              <span className="ll-data-id">{c.id}</span><span>{c.date}</span>
+            </div>
+            <h3 className="ll-data-title">{c.title}</h3>
+            <div className="ll-data-meta">
+              <span style={{ color: "var(--muted)" }}>Viability: {c.viability ? `${c.viability}%` : "-"}</span>
+              <span style={{ color: "var(--muted)" }}>Advisor: {c.advisor || "-"}</span>
+            </div>
+            <div className="ll-data-points">
+              <div className="ll-data-point"><span className="ll-data-point-dot">→</span><span>{c.nextAction}</span></div>
+            </div>
+            <span className={`ll-data-badge ll-data-badge--${c.status === "analysis-complete" ? "ready" : c.status === "advisor-assigned" ? "strong" : "needs"}`}>
+              {c.status === "analysis-complete" && "✅ Analysis Complete"}
+              {c.status === "advisor-assigned"  && "👩‍⚖️ Advisor Assigned"}
+              {c.status === "in-progress"       && "⏳ In Progress"}
+              {c.status === "needs-documents"   && "📄 Needs Documents"}
+            </span>
+            <div className="ll-actions">
+              <Link to="/case-management" className="ll-btn-primary">📋 Manage Case</Link>
+              <button className="ll-btn-secondary" onClick={() => alert("Opening case details...")}>👁️ View Details</button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default RecentCases;
-

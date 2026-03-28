@@ -1,141 +1,94 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../page/Dashboard.css";  // Reuse dashboard styles
+import { Link } from "react-router-dom";
+import "./Dashboard.css";
+import useReveal from "../hooks/useReveal";
 
 const UploadCase = () => {
-  const navigate = useNavigate();
+  useReveal();
+
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
 
   const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    e.preventDefault(); e.stopPropagation();
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
-
   const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(prev => [...prev, ...droppedFiles.slice(0, 3)]);  // Limit to 3 files
+    e.preventDefault(); e.stopPropagation(); setDragActive(false);
+    setFiles(prev => [...prev, ...Array.from(e.dataTransfer.files).slice(0, 3 - prev.length)]);
   };
-
   const handleFileSelect = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(prev => [...prev, ...selectedFiles.slice(0, 3 - prev.length)]);
+    setFiles(prev => [...prev, ...Array.from(e.target.files).slice(0, 3 - prev.length)]);
   };
-
-  const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  const removeFile = (index) => setFiles(prev => prev.filter((_, i) => i !== index));
+  const logout = () => { localStorage.removeItem("token"); window.location.href = "/login"; };
 
   return (
-    <div className="dashboard" style={{ maxWidth: "1000px", margin: "0 auto" }}>
-      {/* Header */}
-      <header className="dashboard-header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <Link to="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong> - Upload Case
-            </span>
-          </Link>
-          
+    <div className="ll-wrap">
+      <nav className="ll-nav ll-reveal" data-ll>
+        <Link to="/dashboard" className="ll-page-back">← Back to Dashboard</Link>
+        <div className="ll-nav-actions">
+          <Link to="/ai-summary" className="ll-cta">View Summaries</Link>
+          <button className="ll-ghost" onClick={logout}>Sign out</button>
         </div>
-        <button className="logout-btn" onClick={logout}>Logout →</button>
+      </nav>
+
+      <header className="ll-page-header ll-reveal" data-ll>
+        <h1 className="ll-page-title">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pur)" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Upload Documents
+        </h1>
       </header>
 
-      {/* Upload Area */}
-      <div className="welcome-card" style={{ marginBottom: "2rem" }}>
-        <h2 className="welcome-title">Drag & drop your documents</h2>
-        <p className="welcome-text">
-          PDF, DOCX, images (max 10MB each, up to 3 files). We'll extract text and run AI analysis.
-        </p>
+      <div className="ll-data-stats ll-reveal" data-ll>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">{files.length}</span><span className="ll-data-stat-l">Files Selected</span></div>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">Max 3 files</span><span className="ll-data-stat-l">10MB each</span></div>
+        <div className="ll-data-stat"><span className="ll-data-stat-n">PDF, DOC, IMG</span><span className="ll-data-stat-l">Supported formats</span></div>
       </div>
 
-      <div 
-        className={`welcome-card ${dragActive ? "drag-active" : ""}`}
-        style={{
-          border: "3px dashed var(--gold)", 
-          padding: "4rem 2rem",
-          textAlign: "center",
-          cursor: "pointer",
-          transition: "all 0.3s"
-        }}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
+      <div
+        className="ll-data-card ll-reveal" data-ll
+        style={{ border: `3px dashed ${dragActive ? "var(--pur-lt)" : "var(--pur)"}`, padding: "4rem 2rem", textAlign: "center", cursor: "pointer", background: dragActive ? "var(--pur-dim)" : "var(--card)" }}
+        onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
         onClick={() => document.getElementById("file-input").click()}
       >
-        <div className="dashboard-card-icon" style={{ fontSize: "4rem", marginBottom: "1rem" }}>📎</div>
-        <h3>Drop files here or click to browse</h3>
-        <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>Supports PDF, DOC, DOCX, JPG, PNG</p>
-        <input
-          id="file-input"
-          type="file"
-          multiple
-          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-          onChange={handleFileSelect}
-          style={{ display: "none" }}
-        />
+        <div className="ll-icon" style={{ "--c": "var(--pur)", margin: "0 auto 1rem", width: "80px", height: "80px" }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="8 17 12 21 16 17"/><line x1="12" y1="13" x2="12" y2="21"/>
+            <path d="M20.88 18.09A5 5 0 0 1 18 9h-1.26A8 8 0 1 0 3 16.09"/>
+          </svg>
+        </div>
+        <h3 className="ll-card-h">Drop files here or click to browse</h3>
+        <p className="ll-card-p">PDF, DOCX, JPG, PNG (max 10MB each, up to 3 files)</p>
+        <input id="file-input" type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={handleFileSelect} style={{ display: "none" }} />
       </div>
 
-      {/* Files Preview */}
       {files.length > 0 && (
-        <div className="dashboard-grid" style={{ marginTop: "2rem", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+        <div className="ll-data-grid ll-reveal" data-ll style={{ marginTop: "2rem" }}>
           {files.map((file, index) => (
-            <div key={index} className="dashboard-card" style={{ position: "relative" }}>
-              <div className="dashboard-card-icon">📄</div>
-              <h3 style={{ fontSize: "1.1rem" }}>{file.name}</h3>
-              <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                {Math.round(file.size / 1024)} KB
-              </p>
-              <button 
-                onClick={() => removeFile(index)}
-                style={{
-                  position: "absolute", top: "1rem", right: "1rem",
-                  background: "var(--rose)", color: "white", border: "none",
-                  borderRadius: "50%", width: "28px", height: "28px",
-                  cursor: "pointer", fontSize: "1rem"
-                }}
-              >
-                ×
-              </button>
+            <div key={index} className="ll-data-card">
+              <div className="ll-data-meta">
+                <span className="ll-data-id">{file.name}</span>
+                <span>{Math.round(file.size / 1024)} KB</span>
+              </div>
+              <button className="ll-ghost" style={{ position: "absolute", top: "1rem", right: "1rem" }} onClick={(e) => { e.stopPropagation(); removeFile(index); }}>×</button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Action Buttons */}
-      {files.length > 0 && (
-        <div style={{ textAlign: "center", marginTop: "2rem" }}>
-          <button 
-            className="logout-btn" 
-            style={{ background: "var(--green)", marginRight: "1rem" }}
-            onClick={() => alert("Uploading & analyzing... (Demo)") }
-          >
-            Analyze Files → 
-          </button>
-          <Link to="/dashboard">
-            <button className="logout-btn" style={{ background: "var(--muted)" }}>Back to Dashboard</button>
-          </Link>
-        </div>
-      )}
+      <div className="ll-actions ll-reveal" data-ll style={{ justifyContent: "center", marginTop: "3rem" }}>
+        {files.length > 0
+          ? <button className="ll-btn-primary" onClick={() => alert("Analyzing with AI... (Demo)")}>🚀 Analyze with AI</button>
+          : <Link to="/ai-summary" className="ll-btn-primary">View Recent Analysis</Link>
+        }
+        <Link to="/dashboard" className="ll-btn-secondary">← Back to Dashboard</Link>
+      </div>
     </div>
   );
 };
 
 export default UploadCase;
-
