@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../page/Dashboard.css";  // Reuse dashboard styles
+import "../page/Dashboard.css";
+
+const SvgSignOut = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
 
 const UploadCase = () => {
   const navigate = useNavigate();
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
+  const [caseText, setCaseText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -23,7 +33,7 @@ const UploadCase = () => {
     setDragActive(false);
     
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(prev => [...prev, ...droppedFiles.slice(0, 3)]);  // Limit to 3 files
+    setFiles(prev => [...prev, ...droppedFiles.slice(0, 3)]);
   };
 
   const handleFileSelect = (e) => {
@@ -35,43 +45,77 @@ const UploadCase = () => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleAnalyze = async () => {
+    if (!caseText.trim() && files.length === 0) {
+      alert("Please upload a file or type some case details.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to upload cases.");
+        navigate("/login");
+        return;
+      }
+
+      const textToAnalyze = caseText.trim() || `Analyzing uploaded files: ${files.map(f => f.name).join(", ")}. Please assess viability based on these documents.`;
+      
+      const response = await fetch("http://localhost:5000/api/cases", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ text: textToAnalyze })
+      });
+
+      if (!response.ok) throw new Error("Analysis failed");
+
+      const result = await response.json();
+      
+      navigate("/ai-summary", { state: { newAnalysis: result } });
+    } catch (error) {
+      console.error(error);
+      alert("Error during model analysis or saving case. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
   return (
-    <div className="dashboard" style={{ maxWidth: "1000px", margin: "0 auto" }}>
-      {/* Header */}
-      <header className="dashboard-header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <Link to="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong> - Upload Case
-            </span>
-          </Link>
-          
+    <div className="ll-wrap">
+      {/* NAV */}
+      <nav className="ll-nav">
+        <Link to="/dashboard" className="ll-logo">Legal<em>Logic</em></Link>
+        <div className="ll-nav-actions">
+          <Link to="/dashboard" className="ll-ghost" style={{ border: "none" }}>Dashboard</Link>
+          <button className="ll-ghost" onClick={logout}>Sign out <SvgSignOut /></button>
         </div>
-        <button className="logout-btn" onClick={logout}>Logout →</button>
+      </nav>
+
+      {/* HEADER */}
+      <header className="ll-intro" style={{ marginBottom: "2rem" }}>
+        <p className="ll-label">Document Analysis</p>
+        <h1 className="ll-h1">Upload Case Files</h1>
+        <p className="ll-desc">Drop your contracts, FIRs, or agreements below for instant OCR and jurisdiction-aware ML analysis.</p>
       </header>
 
-      {/* Upload Area */}
-      <div className="welcome-card" style={{ marginBottom: "2rem" }}>
-        <h2 className="welcome-title">Drag & drop your documents</h2>
-        <p className="welcome-text">
-          PDF, DOCX, images (max 10MB each, up to 3 files). We'll extract text and run AI analysis.
-        </p>
-      </div>
-
+      {/* UPLOAD PANEL */}
       <div 
-        className={`welcome-card ${dragActive ? "drag-active" : ""}`}
+        className={`ll-panel ${dragActive ? "drag-active" : ""}`}
         style={{
-          border: "3px dashed var(--gold)", 
-          padding: "4rem 2rem",
+          border: dragActive ? "2px dashed #1a1a1a" : "1px dashed #d4d4ce", 
           textAlign: "center",
           cursor: "pointer",
-          transition: "all 0.3s"
+          padding: "4rem 2rem",
+          transition: "all 0.2s ease"
         }}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -79,9 +123,9 @@ const UploadCase = () => {
         onDrop={handleDrop}
         onClick={() => document.getElementById("file-input").click()}
       >
-        <div className="dashboard-card-icon" style={{ fontSize: "4rem", marginBottom: "1rem" }}>📎</div>
-        <h3>Drop files here or click to browse</h3>
-        <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>Supports PDF, DOC, DOCX, JPG, PNG</p>
+        <div style={{ fontSize: "2.5rem", marginBottom: "1rem", color: "#1a1a1a" }}>+</div>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: 500, color: "#1a1a1a", marginBottom: "0.5rem" }}>Click to upload or drag and drop</h3>
+        <p style={{ color: "#a4a4a0", fontSize: "0.9rem" }}>PDF, DOCX, or images (max 10MB per file)</p>
         <input
           id="file-input"
           type="file"
@@ -92,50 +136,48 @@ const UploadCase = () => {
         />
       </div>
 
-      {/* Files Preview */}
       {files.length > 0 && (
-        <div className="dashboard-grid" style={{ marginTop: "2rem", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-          {files.map((file, index) => (
-            <div key={index} className="dashboard-card" style={{ position: "relative" }}>
-              <div className="dashboard-card-icon">📄</div>
-              <h3 style={{ fontSize: "1.1rem" }}>{file.name}</h3>
-              <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                {Math.round(file.size / 1024)} KB
-              </p>
-              <button 
-                onClick={() => removeFile(index)}
-                style={{
-                  position: "absolute", top: "1rem", right: "1rem",
-                  background: "var(--rose)", color: "white", border: "none",
-                  borderRadius: "50%", width: "28px", height: "28px",
-                  cursor: "pointer", fontSize: "1rem"
-                }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
+        <div className="ll-panel">
+          <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Selected Files</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            {files.map((file, index) => (
+              <div key={index} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.75rem 1rem", border: "1px solid #e2e2de", background: "#fdfcfc", borderRadius: "8px" }}>
+                <span style={{ fontSize: "0.9rem", color: "#1a1a1a" }}>{file.name} 
+                  <span style={{ color: "#a4a4a0", marginLeft: "0.5rem" }}>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                </span>
+                <button onClick={() => removeFile(index)} style={{ border: "none", background: "transparent", color: "#c0392b", cursor: "pointer", fontWeight: 500 }}>Remove</button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Action Buttons */}
-      {files.length > 0 && (
-        <div style={{ textAlign: "center", marginTop: "2rem" }}>
-          <button 
-            className="logout-btn" 
-            style={{ background: "var(--green)", marginRight: "1rem" }}
-            onClick={() => alert("Uploading & analyzing... (Demo)") }
-          >
-            Analyze Files → 
-          </button>
-          <Link to="/dashboard">
-            <button className="logout-btn" style={{ background: "var(--muted)" }}>Back to Dashboard</button>
-          </Link>
-        </div>
-      )}
+      {/* TEXT AREA */}
+      <div className="ll-panel">
+        <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Or transcribe manually:</h3>
+        <textarea
+          className="ll-input"
+          value={caseText}
+          onChange={(e) => setCaseText(e.target.value)}
+          placeholder="I entered into a co-founder contract on Jan 2024..."
+          style={{ height: "160px", resize: "vertical" }}
+        />
+      </div>
+
+      {/* ACTIONS */}
+      <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
+        <button className="ll-ghost" onClick={() => navigate("/dashboard")}>Cancel</button>
+        <button 
+          className="ll-cta" 
+          onClick={handleAnalyze} 
+          disabled={loading}
+          style={{ padding: "0.75rem 2rem", fontSize: "0.95rem" }}
+        >
+          {loading ? "Analyzing..." : "Analyze Case →"}
+        </button>
+      </div>
     </div>
   );
 };
 
 export default UploadCase;
-

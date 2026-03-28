@@ -1,35 +1,124 @@
-import { Link, useNavigate } from "react-router-dom";
-import "../page/Dashboard.css";  // Reuse styles
+import { jsPDF } from "jspdf";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import "../page/Dashboard.css";
+
+const SvgSignOut = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
 
 const AiSummary = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const summaries = [
-    {
-      id: "#CASE-001",
-      title: "Contract Dispute - Co-founder Equity Vesting",
-      date: "2 hours ago",
-      viability: 78,
-      keyPoints: ["Strong breach claim (87%)", "Supporting docs complete", "Precedents favorable", "Recommend legal notice"],
-      status: "ready"
-    },
-    {
-      id: "#CASE-002", 
-      title: "Employment Termination - Wrongful Dismissal",
-      date: "1 day ago",
-      viability: 62,
-      keyPoints: ["Moderate case strength", "Need termination letter", "Witness statements pending", "Gather more evidence"],
-      status: "needs-more"
-    },
-    {
-      id: "#CASE-003",
-      title: "Property Dispute - Rental Agreement Breach",
-      date: "3 days ago", 
-      viability: 89,
-      keyPoints: ["Excellent case viability", "Clear lease violation", "Security deposit recoverable", "File in consumer court"],
-      status: "strong"
+  // Fetch all cases from the database
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/cases", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCases(data);
+        } else {
+          console.error("Failed to fetch cases");
+        }
+      } catch (error) {
+        console.error("Error fetching cases:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCases();
+  }, [navigate]);
+
+  // Handle case deletion
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to completely delete this case analysis from the server?");
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:5000/api/cases/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setCases(prev => prev.filter(c => c._id !== id));
+      } else {
+        alert("Failed to delete the case.");
+      }
+    } catch (error) {
+      console.error("Error deleting case:", error);
+      alert("Error deleting case.");
     }
-  ];
+  };
+
+  const handleDownloadPdf = (summary) => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("LegalLogic - AI Case Summary", 20, 20);
+    
+    // Details Header
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Case ID: ${summary.caseId}`, 20, 35);
+    doc.text(`Prepared: ${new Date(summary.createdAt).toLocaleDateString()}`, 120, 35);
+
+    // Case Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(summary.title, 20, 48);
+
+    // Status and Score
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Status: ${summary.status.toUpperCase()}`, 20, 58);
+    doc.text(`Viability Score: ${summary.viabilityScore}%`, 120, 58);
+
+    // Divider
+    doc.line(20, 65, 190, 65);
+
+    // Dynamic Keypoints
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Analysis Details:", 20, 75);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    
+    let yPos = 85;
+    (summary.keyPoints || []).forEach(point => {
+      const lines = doc.splitTextToSize(`• ${point}`, 170);
+      doc.text(lines, 20, yPos);
+      yPos += (10 * lines.length);
+    });
+
+    doc.save(`${summary.caseId}_LegalLogic.pdf`);
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -37,152 +126,107 @@ const AiSummary = () => {
   };
 
   return (
-    <div className="dashboard" style={{ maxWidth: "1200px", margin: "0 auto" }}>
-      {/* Header */}
-      <header className="dashboard-header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <Link to="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong> - AI Case Summary
-            </span>
-          </Link>
-          
+    <div className="ll-wrap">
+      {/* NAV */}
+      <nav className="ll-nav">
+        <Link to="/dashboard" className="ll-logo">Legal<em>Logic</em></Link>
+        <div className="ll-nav-actions">
+          <Link to="/dashboard" className="ll-ghost" style={{ border: "none" }}>Dashboard</Link>
+          <button className="ll-ghost" onClick={logout}>Sign out <SvgSignOut /></button>
         </div>
-        <button className="logout-btn" onClick={logout}>Logout →</button>
+      </nav>
+
+      {/* HEADER */}
+      <header className="ll-intro" style={{ marginBottom: "2rem" }}>
+        <p className="ll-label">AI Legal Engine</p>
+        <h1 className="ll-h1">AI Case Summary</h1>
+        <p className="ll-desc">Review your probability-based outcomes and dynamic legal recommendations directly from the ML engine.</p>
       </header>
 
-      {/* Stats Header */}
-      <div className="dashboard-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", marginBottom: "2rem" }}>
-        <div className="dashboard-card">
-          <div className="dashboard-card-icon">📊</div>
-          <h3 style={{ fontSize: "1.3rem" }}>3 Cases</h3>
-          <p>Analyzed this month</p>
-        </div>
-        <div className="dashboard-card">
-          <div className="dashboard-card-icon">⭐</div>
-          <h3 style={{ fontSize: "1.3rem" }}>82%</h3>
-          <p>Avg viability score</p>
-        </div>
-        <div className="dashboard-card">
-          <div className="dashboard-card-icon">⚡</div>
-          <h3 style={{ fontSize: "1.3rem" }}>12 min</h3>
-          <p>Avg analysis time</p>
-        </div>
+      {/* TOOLS BAR */}
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", alignItems: "center" }}>
+        <Link to="/upload-case" className="ll-cta">+ Analyze New Action</Link>
+        <div style={{ flex: 1 }} />
       </div>
 
-      {/* Summaries Grid */}
-      <div className="dashboard-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr)", gap: "1.5rem" }}>
-        {summaries.map((summary, index) => (
-          <div key={summary.id} className="dashboard-card" style={{ padding: "2.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-              <div>
-                <span style={{ 
-                  fontFamily: "'JetBrains Mono', monospace", 
-                  fontSize: "0.85rem", 
-                  color: "var(--gold)",
-                  background: "color-mix(in srgb, var(--gold) 8%, transparent)",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "20px",
-                  border: "1px solid var(--gold-dim)"
-                }}>
-                  {summary.id}
+      {loading && <div style={{ textAlign: "center", padding: "3rem", color: "#b0b0aa" }}>Extracting your latest intelligence cases...</div>}
+
+      {!loading && cases.length === 0 && (
+         <div className="ll-panel" style={{ textAlign: "center" }}>
+           <p style={{ marginBottom: "1.5rem", color: "#1a1a1a" }}>No documents analyzed yet.</p>
+           <Link to="/upload-case" className="ll-cta">Start first analysis</Link>
+         </div>
+      )}
+
+      {/* SUMMARIES LISTING */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", paddingBottom: "2rem" }}>
+        {cases.map((summary) => (
+          <div key={summary._id} className="ll-panel" style={{ padding: "2.5rem 3rem", display: "flex", flexDirection: "column", gap: "1.25rem", marginBottom: 0 }}>
+            {/* CARD HEADER */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div style={{ display: "flex", alignContent: "flex-start", gap: "1rem", alignItems: "center" }}>
+                <span className="ll-pill" style={{ color: "#8c7a5e", fontFamily: "JetBrains Mono, monospace", background: "#fcfaf6", border: "1px solid #f0ead9" }}>
+                  {summary.caseId}
+                </span>
+                <span style={{ fontSize: "0.80rem", color: "#a4a4a0", letterSpacing: "0.02em" }}>
+                  Prepared: {new Date(summary.createdAt).toLocaleDateString()}
                 </span>
               </div>
-              <div className={`status-badge status-${summary.status}`}>
-                {summary.status === "ready" && "✅ Ready"}
-                {summary.status === "needs-more" && "⚠️ Needs More"}
-                {summary.status === "strong" && "🚀 Strong Case"}
+              
+              <span className="ll-pill">
+                {summary.status.toUpperCase().replace("-", " ")}
+              </span>
+            </div>
+
+            {/* TITLE & SCORE */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1rem" }}>
+              <h3 style={{ fontFamily: "Instrument Serif, serif", fontSize: "2rem", color: "#1a1a1a", maxWidth: "70%", lineHeight: 1.1 }}>
+                {summary.title}
+              </h3>
+              <div style={{ textAlign: "right", borderLeft: "1px solid #e2e2de", paddingLeft: "2rem" }}>
+                <div style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#b0b0aa", marginBottom: "0.25rem" }}>Viability Rating</div>
+                <div style={{ fontFamily: "Instrument Serif, serif", fontSize: "2.5rem", color: "#1a1a1a", lineHeight: 1 }}>{summary.viabilityScore}%</div>
               </div>
             </div>
 
-            <h3 className="dashboard-card-title" style={{ marginBottom: "1rem", fontSize: "1.4rem" }}>
-              {summary.title}
-            </h3>
-            
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "0.75rem", 
-              marginBottom: "1.5rem",
-              fontFamily: "'JetBrains Mono', monospace",
-              color: "var(--muted)"
-            }}>
-              <div className="dashboard-card-icon" style={{ fontSize: "1.2rem" }}>📅</div>
-              <span>{summary.date}</span>
-              <div style={{ width: "1px", height: "20px", background: "var(--border)" }} />
-              <span>Viability: <strong style={{ color: "var(--gold)", fontSize: "1.2rem" }}>{summary.viability}%</strong></span>
+            {/* KEY POINTS */}
+            <div style={{ marginTop: "1.5rem", background: "#faf9f7", padding: "1.5rem 2rem", borderRadius: "10px", border: "1px solid #ecece8" }}>
+              <h4 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "#8c8c88", marginBottom: "1rem" }}>Analysis Key Points</h4>
+              <ul style={{ listStyleType: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {(summary.keyPoints || []).map((point, i) => (
+                  <li key={i} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start", fontSize: "0.95rem", lineHeight: 1.6, color: "#1a1a1a" }}>
+                    <span style={{ color: "#8c7a5e" }}>—</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div style={{ display: "grid", gap: "0.75rem", marginBottom: "1.5rem" }}>
-              {summary.keyPoints.map((point, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                  <span style={{ color: "var(--gold)", fontWeight: "600", fontSize: "1.1rem", marginTop: "0.15rem" }}>•</span>
-                  <span style={{ lineHeight: "1.5" }}>{point}</span>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
+            {/* ACTIONS FOOTER */}
+            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+              <div style={{ flex: 1 }} />
               <button 
-                style={{
-                  padding: "0.75rem 1.5rem",
-                  background: "var(--gold)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.5rem",
-                  fontFamily: "'Outfit', sans-serif",
-                  cursor: "pointer"
-                }}
-                onClick={() => alert("Downloading PDF summary...")}
+                className="ll-ghost" 
+                onClick={() => handleDownloadPdf(summary)}
               >
-                📥 Download PDF
+                Export PDF
               </button>
+              <Link to="/find-advisors" className="ll-cta">
+                Instruct Counsel
+              </Link>
               <button 
-                style={{
-                  padding: "0.75rem 1.5rem",
-                  background: "transparent",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "0.5rem",
-                  fontFamily: "'Outfit', sans-serif",
-                  cursor: "pointer"
-                }}
+                className="ll-ghost" 
+                onClick={() => handleDelete(summary._id)}
+                style={{ color: "#c0392b", borderColor: "transparent" }}
               >
-                ✏️ Edit Analysis
+                Drop Case
               </button>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Action Bar */}
-      <div style={{ textAlign: "center", marginTop: "3rem", paddingTop: "2rem", borderTop: "1px solid var(--border)" }}>
-        <Link to="/upload-case">
-          <button className="logout-btn" style={{ background: "var(--blue)", marginRight: "1rem" }}>
-            📂 Upload New Case
-          </button>
-        </Link>
-        <Link to="/dashboard">
-          <button className="logout-btn" style={{ background: "var(--muted)" }}>← Back to Dashboard</button>
-        </Link>
-      </div>
-
-      <style jsx>{`
-        .status-ready { background: color-mix(in srgb, var(--green) 12%, transparent); color: var(--green); }
-        .status-needs-more { background: color-mix(in srgb, var(--gold) 12%, transparent); color: var(--gold); }
-        .status-strong { background: color-mix(in srgb, var(--teal) 12%, transparent); color: var(--teal); }
-        .status-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-family: 'JetBrains Mono', monospace;
-          font-weight: 500;
-        }
-      `}</style>
     </div>
   );
 };
 
 export default AiSummary;
-

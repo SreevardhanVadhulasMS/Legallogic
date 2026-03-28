@@ -1,24 +1,239 @@
 /* ================================================================
-   LegalLogic Dashboard  ·  Dark Gray Professional
-   All classes prefixed ll-  |  Instrument Serif + Geist
+   LegalLogic — Global CSS Variables & Inner Page Styles
+   Light Mode — used by AiSummary, UploadCase, CaseManagement, etc.
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --bg:        #f7f6f3;
+  --surface:   #ffffff;
+  --border:    #e2e2de;
+  --text:      #1a1a1a;
+  --muted:     #6b6b6b;
+  --gold:      #9a7d4a;
+  --gold-dim:  #c9ab79;
+  --green:     #2d7a4e;
+  --blue:      #2563a8;
+  --teal:      #1e7a72;
+  --violet:    #6b3fa0;
+  --rose:      #c0392b;
+  --red:       #c0392b;
+}
+
+html, body { background: var(--bg) !important; margin: 0; padding: 0; }
+
+/* ── Base Typography ───────────────────────────────────────── */
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Dashboard Layout ──────────────────────────────────────── */
+.dashboard {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 0 2rem 4rem;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+
+/* ── Brand ──────────────────────────────────────────────────── */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  background: var(--text);
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.brand-name strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Page Title ─────────────────────────────────────────────── */
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.15;
+}
+
+.dashboard-subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* ── Dashboard Grid ─────────────────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Welcome / Info Card ─────────────────────────────────────── */
+.welcome-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.welcome-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ── Dashboard Card ─────────────────────────────────────────── */
+.dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+.dashboard-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.dashboard-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Logout / Action Button ─────────────────────────────────── */
+.logout-btn {
+  padding: 0.55rem 1.25rem;
+  background: var(--text);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.logout-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+/* ── Status Badges ──────────────────────────────────────────── */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+.status-ready    { background: #e8f5ee; color: var(--green); }
+.status-needs-more { background: #fef6e7; color: var(--gold); }
+.status-strong   { background: #e8f2fc; color: var(--blue); }
+.status-active   { background: #e8f5ee; color: var(--green); }
+.status-pending  { background: #fef6e7; color: var(--gold); }
+.status-closed   { background: #f0f0f0; color: var(--muted); }
+
+/* ── Drag active ────────────────────────────────────────────── */
+.drag-active {
+  border-color: var(--gold) !important;
+  background: #fdf8f0 !important;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashboard { padding: 0 1rem 3rem; }
+  .dashboard-title { font-size: 1.75rem; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ================================================================
+   LegalLogic Dashboard  ·  ll- prefixed classes (Dashboard.jsx)
    ================================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap');
+
 
 /* ── Hard reset scoped to wrapper ─────────────────────────── */
 .ll-wrap {
   all: initial;
   display: block;
   min-height: 100vh;
-  background: #111214;
-  color: #e4e4e6;
+  background: #f7f6f3;
+  color: #1a1a1a;
   font-family: 'Geist', sans-serif;
   font-weight: 300;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
-  padding: 0 2.5rem 4rem;
-  max-width: 1240px;
+  padding: 0 6vw 4rem;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -29,7 +244,7 @@
 }
 
 /* make the html/body background match */
-body { background: #111214 !important; }
+body { background: #f7f6f3 !important; }
 
 /* ── Reveal animation ─────────────────────────────────────── */
 [data-ll] {
@@ -48,18 +263,23 @@ body { background: #111214 !important; }
   align-items: center;
   justify-content: space-between;
   height: 54px;
-  border-bottom: 1px solid #222226;
+  border-bottom: 1px solid #e2e2de;
   margin-bottom: 2.75rem;
 }
 
 .ll-logo {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.15rem;
+  font-size: 2.25rem;
   font-style: normal;
-  color: #e4e4e6;
+  color: #1a1a1a;
+  line-height: 1;
   text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.ll-logo em { font-style: italic; color: #666670; }
+.ll-logo:hover {
+  transform: scale(1.05);
+}
+.ll-logo em { font-style: italic; color: #8c7a5e; }
 
 .ll-nav-actions {
   display: flex;
@@ -71,18 +291,23 @@ body { background: #111214 !important; }
   display: inline-flex;
   align-items: center;
   padding: 0.45rem 1rem;
-  background: #e4e4e6;
+  background: #1a1a1a;
   border: none;
-  color: #111214;
+  color: #ffffff;
   font-family: 'Geist', sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
   border-radius: 7px;
   cursor: pointer;
-  transition: background 0.15s;
   letter-spacing: 0.01em;
+  transition: background 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
 }
-.ll-cta:hover { background: #ffffff; }
+.ll-cta:hover { 
+  background: #333333; 
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+.ll-cta:active { transform: translateY(0) scale(0.98); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
 .ll-ghost {
   display: inline-flex;
@@ -90,16 +315,23 @@ body { background: #111214 !important; }
   gap: 0.4rem;
   padding: 0.45rem 1rem;
   background: transparent;
-  border: 1px solid #28282e;
-  color: #666670;
+  border: 1px solid #d4d4ce;
+  color: #6b6b6b;
   font-family: 'Geist', sans-serif;
   font-size: 0.8rem;
   font-weight: 400;
   border-radius: 7px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.ll-ghost:hover { color: #e4e4e6; border-color: #3c3c44; }
+.ll-ghost:hover { 
+  color: #1a1a1a; 
+  border-color: #999998; 
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.ll-ghost:active { transform: translateY(0); }
 
 /* ── INTRO ────────────────────────────────────────────────── */
 .ll-intro {
@@ -112,7 +344,7 @@ body { background: #111214 !important; }
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #444450;
+  color: #999998;
   margin-bottom: 0.875rem;
 }
 
@@ -122,14 +354,14 @@ body { background: #111214 !important; }
   font-weight: 400;
   line-height: 1.18;
   letter-spacing: -0.02em;
-  color: #e4e4e6;
+  color: #1a1a1a;
   margin-bottom: 0.875rem;
 }
-.ll-h1 em { font-style: italic; color: #666670; }
+.ll-h1 em { font-style: italic; color: #8c7a5e; }
 
 .ll-desc {
   font-size: 0.9rem;
-  color: #666670;
+  color: #6b6b6b;
   line-height: 1.72;
   font-weight: 300;
 }
@@ -140,13 +372,13 @@ body { background: #111214 !important; }
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #1c1c20;
+  border-bottom: 1px solid #e2e2de;
   margin-bottom: 1px;
   font-size: 0.68rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #3e3e46;
+  color: #b0b0aa;
 }
 
 /* ── GRID ─────────────────────────────────────────────────── */
@@ -154,8 +386,8 @@ body { background: #111214 !important; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  background: #1c1c20;
-  border: 1px solid #1c1c20;
+  background: #e2e2de;
+  border: 1px solid #e2e2de;
   border-radius: 13px;
   overflow: hidden;
   margin-bottom: 3rem;
@@ -177,12 +409,12 @@ body { background: #111214 !important; }
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  background: #161619;
+  background: #ffffff;
   font-family: 'Geist', sans-serif;
   /* staggered entrance */
   animation: ll-up 0.45s ease both;
   animation-delay: var(--d, 0ms);
-  transition: background 0.18s ease;
+  transition: background 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 @keyframes ll-up {
@@ -190,18 +422,22 @@ body { background: #111214 !important; }
   to   { opacity: 1; transform: none; }
 }
 
-.ll-card:hover { background: #1b1b1f; }
+.ll-card:hover { 
+  background: #ffffff; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+  z-index: 10;
+}
 
 /* colour strip bottom */
 .ll-card::after {
   content: '';
   position: absolute;
   inset: auto 0 0 0;
-  height: 2px;
-  background: var(--c, #555);
+  height: 3px;
+  background: var(--c, #bbb);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.25s ease;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .ll-card:hover::after { transform: scaleX(1); }
 
@@ -218,13 +454,18 @@ body { background: #111214 !important; }
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: color-mix(in srgb, var(--c) 14%, #161619);
-  border: 1px solid color-mix(in srgb, var(--c) 24%, transparent);
+  background: color-mix(in srgb, var(--c) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--c) 20%, transparent);
   color: var(--c);
   flex-shrink: 0;
-  transition: transform 0.18s ease;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease, color 0.3s ease;
 }
-.ll-card:hover .ll-icon { transform: scale(1.07); }
+.ll-card:hover .ll-icon { 
+  transform: scale(1.15) rotate(5deg); 
+  background: var(--c);
+  color: #ffffff;
+  box-shadow: 0 8px 16px color-mix(in srgb, var(--c) 30%, transparent);
+}
 
 /* lock SVG inside icon — the critical fix */
 .ll-icon svg {
@@ -243,14 +484,14 @@ body { background: #111214 !important; }
   font-family: 'Instrument Serif', serif;
   font-size: 1.35rem;
   font-weight: 400;
-  color: #e4e4e6;
+  color: #1a1a1a;
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .ll-card-p {
   font-size: 0.845rem;
-  color: #666670;
+  color: #6b6b6b;
   line-height: 1.72;
   font-weight: 300;
   flex: 1;
@@ -269,9 +510,9 @@ body { background: #111214 !important; }
   font-size: 0.67rem;
   font-weight: 500;
   letter-spacing: 0.05em;
-  color: #444450;
-  background: #1c1c20;
-  border: 1px solid #26262c;
+  color: #8c8c88;
+  background: #f2f2ef;
+  border: 1px solid #e2e2de;
   padding: 0.2rem 0.65rem;
   border-radius: 20px;
   white-space: nowrap;
@@ -282,11 +523,11 @@ body { background: #111214 !important; }
   height: 28px;
   min-width: 28px;
   border-radius: 50%;
-  border: 1px solid #26262c;
+  border: 1px solid #e2e2de;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #444450;
+  color: #aaaaaa;
   flex-shrink: 0;
   overflow: hidden;
   transition: color 0.18s, border-color 0.18s, transform 0.18s;
@@ -299,8 +540,8 @@ body { background: #111214 !important; }
   flex-shrink: 0;
 }
 .ll-card:hover .ll-arr {
-  color: #e4e4e6;
-  border-color: #3c3c44;
+  color: #1a1a1a;
+  border-color: #999998;
   transform: translate(2px, -2px);
 }
 
@@ -310,16 +551,16 @@ body { background: #111214 !important; }
   align-items: center;
   justify-content: space-between;
   padding-top: 1.5rem;
-  border-top: 1px solid #1c1c20;
+  border-top: 1px solid #e2e2de;
   font-size: 0.72rem;
-  color: #3e3e46;
+  color: #b0b0aa;
   letter-spacing: 0.04em;
 }
 
 .ll-footer-logo {
   font-family: 'Instrument Serif', serif;
   font-size: 0.95rem;
-  color: #3e3e46;
+  color: #b0b0aa;
 }
 .ll-footer-logo em { font-style: italic; }
 
@@ -335,6 +576,74 @@ body { background: #111214 !important; }
 
 /* ── Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #111214; }
-::-webkit-scrollbar-thumb { background: #28282e; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #3c3c44; }
+::-webkit-scrollbar-track { background: #f7f6f3; }
+::-webkit-scrollbar-thumb { background: #d4d4ce; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #b0b0aa; }
+
+/* ── Inner Page Specific ──────────────────────────────────────────── */
+.ll-panel {
+  background: #ffffff;
+  border: 1px solid #e2e2de;
+  border-radius: 13px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.ll-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ll-table th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b0b0aa;
+  font-weight: 500;
+  border-bottom: 1px solid #e2e2de;
+}
+
+.ll-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #ecece8;
+  vertical-align: middle;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.ll-input {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #e2e2de;
+  border-radius: 8px;
+  background: #faf9f7;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ll-input::placeholder { color: #a4a4a0; }
+
+.ll-input:focus {
+  outline: none;
+  border-color: #1a1a1a;
+  background: #ffffff;
+}
+
+.ll-pill {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  background: #f2f2ef;
+  border: 1px solid #e2e2de;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  color: #1a1a1a;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}

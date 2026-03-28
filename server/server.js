@@ -1,9 +1,11 @@
 import express from "express";
-import cors from "cors";
+import cors from "cors"; // Nodemon triggered
 import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
+import mlRoutes from "./routes/ml.js";
+import caseRoutes from "./routes/cases.js";
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ app.use(express.json());
 
 /* Routes */
 app.use("/api/auth", authRoutes);
+app.use("/api/ml", mlRoutes);
+app.use("/api/cases", caseRoutes);
 
 app.get("/", (req, res) => {
   res.send("LegalLogic API running ⚖️");
