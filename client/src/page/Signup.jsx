@@ -16,6 +16,7 @@ function Signup() {
 
   const handleSignup = async () => {
     try {
+      setError(""); // Clear previous errors
       const res = await api.post("/auth/signup", {
         name,
         email,
@@ -23,21 +24,19 @@ function Signup() {
       });
 
       localStorage.setItem("token", res.data.token);
-
       setSuccess("Account created successfully! Redirecting...");
 
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
-    } catch {
-      setError("Signup failed");
+    } catch (err) {
+      setError(err.response?.data?.message || "Signup failed. Please try again.");
     }
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        
         <h1 className="auth-title">
           Legal<span>Logic</span>
         </h1>
@@ -47,27 +46,37 @@ function Signup() {
         {error && <p className="auth-error">{error}</p>}
         {success && <p className="auth-success">{success}</p>}
 
-        <input
-          className="auth-input"
-          placeholder="Full Name"
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          className="auth-input"
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <div className="password-field">
+        {/* Full Name Input */}
+        <div className="input-group">
           <input
-            className="auth-input"
+            type="text"
+            required
+            placeholder=" "
+            onChange={(e) => setName(e.target.value)}
+          />
+          <label>Full Name</label>
+        </div>
+
+        {/* Email Input */}
+        <div className="input-group">
+          <input
+            type="email"
+            required
+            placeholder=" "
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <label>Email Address</label>
+        </div>
+
+        {/* Password Input */}
+        <div className="input-group">
+          <input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            required
+            placeholder=" "
             onChange={(e) => setPassword(e.target.value)}
           />
-
+          <label>Password</label>
           <span
             className="toggle-password"
             onClick={() => setShowPassword(!showPassword)}
@@ -76,12 +85,16 @@ function Signup() {
           </span>
         </div>
 
-        <button className="auth-btn" onClick={handleSignup} disabled={success}>
-          Create Account
+        <button 
+          className="auth-btn" 
+          onClick={handleSignup} 
+          disabled={success}
+        >
+          {success ? "Success!" : "Create Account"}
         </button>
 
         <p className="auth-switch">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login">Sign In</Link>
         </p>
       </div>
     </div>

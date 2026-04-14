@@ -7,7 +7,6 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function Login() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,15 +14,11 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
-
+      const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
     } catch (err) {
-      setError("Login failed");
+      setError("Invalid email or password");
     }
   };
 
@@ -33,7 +28,6 @@ function Login() {
         <h1 className="auth-title">
           Legal<span>Logic</span>
         </h1>
-
         <p className="auth-subtitle">Welcome back</p>
 
         {error && <p className="auth-error">{error}</p>}
@@ -42,20 +36,20 @@ function Login() {
           <input
             type="email"
             required
+            placeholder=" " // Keep space for floating label effect
             onChange={(e) => setEmail(e.target.value)}
           />
-
-          <label>Email</label>
+          <label>Email Address</label>
         </div>
 
-        <div className="password-field">
+        <div className="input-group">
           <input
-            className="auth-input"
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            required
+            placeholder=" "
             onChange={(e) => setPassword(e.target.value)}
           />
-
+          <label>Password</label>
           <span
             className="toggle-password"
             onClick={() => setShowPassword(!showPassword)}
@@ -65,33 +59,34 @@ function Login() {
         </div>
 
         <button className="auth-btn" onClick={handleLogin}>
-          Login
+          Sign In
         </button>
 
         <div className="auth-divider">
           <span>OR</span>
         </div>
 
-        <GoogleLogin
-          onSuccess={async (credentialResponse) => {
-            try {
-              const res = await api.post("/auth/google", {
-                credential: credentialResponse.credential,
-              });
-
-              localStorage.setItem("token", res.data.token);
-              navigate("/dashboard");
-            } catch (error) {
-              setError("Google login failed");
-            }
-          }}
-          onError={() => {
-            setError("Google login failed");
-          }}
-        />
+        <div className="google-wrapper">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const res = await api.post("/auth/google", {
+                  credential: credentialResponse.credential,
+                });
+                localStorage.setItem("token", res.data.token);
+                navigate("/dashboard");
+              } catch (error) {
+                setError("Google login failed");
+              }
+            }}
+            onError={() => setError("Google login failed")}
+            theme="filled_black" // Fits the dark/purple vibe better
+            shape="pill"
+          />
+        </div>
 
         <p className="auth-switch">
-          Don’t have an account? <Link to="/signup">Signup</Link>
+          Don’t have an account? <Link to="/signup">Create account</Link>
         </p>
       </div>
     </div>
