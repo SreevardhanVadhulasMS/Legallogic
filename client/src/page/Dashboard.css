@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   --bg: #ffffff;           /* Forced White Background */
@@ -16,7 +16,7 @@
   min-height: 100vh;
   background: var(--bg);
   color: var(--text-main);
-  font-family: 'Geist', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   padding: 0 6vw 4rem;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
@@ -35,7 +35,7 @@ body { background: #ffffff !important; margin: 0; }
 }
 
 .ll-logo {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 2.2rem;
   color: var(--text-main);
   text-decoration: none;
@@ -63,7 +63,7 @@ body { background: #ffffff !important; margin: 0; }
 
 /* ── Hero ── */
 .ll-h1 { 
-  font-family: 'Instrument Serif', serif; 
+  font-family: 'Bricolage Grotesque', sans-serif; 
   font-size: clamp(2.5rem, 5vw, 3.8rem); 
   color: var(--text-main); /* Explicit Dark Text */
   line-height: 1.1; 
@@ -113,7 +113,7 @@ body { background: #ffffff !important; margin: 0; }
   font-size: 1.5rem; 
   color: var(--text-main); /* Dark visible title */
   margin-bottom: 0.75rem; 
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
 }
 
 .ll-card-p { 
