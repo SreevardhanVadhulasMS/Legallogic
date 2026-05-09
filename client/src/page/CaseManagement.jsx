@@ -1,238 +1,672 @@
-import { Link, useNavigate } from "react-router-dom";
-import "../page/Dashboard.css";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  LayoutDashboard,
+  LogOut,
+  PlusCircle,
+  UploadCloud,
+  FileText,
+  CalendarDays,
+  Wallet,
+  Users,
+  Sparkles,
+  ChevronRight,
+  Scale,
+  X,
+  CheckCircle2,
+  Clock3,
+  FolderCheck,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../utils/axios";
+import "./CaseManagement.css";
 
 const CaseManagement = () => {
   const navigate = useNavigate();
 
-  const activeCase = {
-    id: "#CASE-001",
-    title: "Contract Dispute - Co-founder Equity Vesting",
-    status: "active",
-    created: "2025-01-10",
-    nextHearing: "2025-02-15",
-    advisor: "Ravi Sharma",
-    documents: 12,
-    notesCount: 8,
-    viability: 78
+  const selectedRef = useRef(null);
+
+  const [cases, setCases] = useState([]);
+  const [selectedCase, setSelectedCase] = useState(null);
+  const [showAllCases, setShowAllCases] = useState(false);
+
+  const [note, setNote] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+
+  const [toast, setToast] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [showNewCaseModal, setShowNewCaseModal] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  const [newCaseText, setNewCaseText] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  const authHeader = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   };
 
-  const timeline = [
-    {
-      date: "2025-01-10",
-      event: "Case Created",
-      type: "milestone",
-      icon: "📋"
-    },
-    {
-      date: "2025-01-12", 
-      event: "Documents Uploaded",
-      type: "upload",
-      icon: "📎",
-      details: "5 files (2.4 MB total)"
-    },
-    {
-      date: "2025-01-15",
-      event: "AI Analysis Complete",
-      type: "ai-analysis",
-      icon: "🤖",
-      details: "Viability score: 78%"
-    },
-    {
-      date: "2025-01-18",
-      event: "Advisor Assigned",
-      type: "advisor",
-      icon: "👨‍⚖️",
-      details: "Ravi Sharma (4.9★)"
-    },
-    {
-      date: "2025-01-22",
-      event: "Legal Notice Sent",
-      type: "action",
-      icon: "📤"
-    },
-    {
-      date: "2025-02-15",
-      event: "Next Hearing",
-      type: "hearing",
-      icon: "⚖️"
-    }
-  ];
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2200);
+  };
 
-  const quickActions = [
-    { icon: "➕", label: "Add Document", action: "upload", color: "var(--blue)" },
-    { icon: "✏️", label: "Add Note", action: "note", color: "var(--teal)" },
-    { icon: "📅", label: "Schedule Hearing", action: "hearing", color: "var(--violet)" },
-    { icon: "💰", label: "Add Expense", action: "expense", color: "var(--gold)" },
-    { icon: "📧", label: "Send Message", action: "message", color: "var(--rose)" }
-  ];
+  const getProgress = (item) => {
+    let progress = 8;
+
+    if (item.notes?.length > 0) progress += 10;
+    if (item.schedule?.length > 0) progress += 12;
+    if (item.advisor) progress += 15;
+
+    if (item.status === "ready") progress += 18;
+    if (item.status === "strong") progress += 30;
+
+    return Math.min(progress, 100);
+  };
+
+  const getStatusBadge = (status) => {
+    if (status === "strong") {
+      return {
+        text: "Resolved",
+        className: "status-green",
+        icon: <CheckCircle2 size={14} />,
+      };
+    }
+
+    if (status === "ready") {
+      return {
+        text: "Active",
+        className: "status-purple",
+        icon: <FolderCheck size={14} />,
+      };
+    }
+
+    return {
+      text: "Pending",
+      className: "status-yellow",
+      icon: <Clock3 size={14} />,
+    };
+  };
+
+  const fetchCases = async () => {
+    try {
+      setLoading(true);
+
+      const res = await api.get("/cases", authHeader);
+
+      setCases(res.data);
+
+      if (res.data.length > 0) {
+        setSelectedCase((prev) => {
+          if (!prev) return res.data[0];
+
+          const updated = res.data.find((item) => item._id === prev._id);
+
+          return updated || res.data[0];
+        });
+      } else {
+        setSelectedCase(null);
+      }
+    } catch (error) {
+      showToast("Failed to load cases");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCases();
+
+    const isModalOpen = showNewCaseModal || showNotesModal || showScheduleModal;
+
+    document.body.style.overflow = isModalOpen ? "hidden" : "";
+    document.body.style.paddingRight = isModalOpen ? "0px" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, [showNewCaseModal, showNotesModal, showScheduleModal]);
+
+  const handleCaseSelect = (item) => {
+    setSelectedCase(item);
+
+    setTimeout(() => {
+      selectedRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
+  };
+
+  const createCase = async () => {
+    try {
+      if (!newCaseText.trim()) {
+        showToast("Enter case content");
+        return;
+      }
+
+      await api.post("/cases", { text: newCaseText }, authHeader);
+
+      setNewCaseText("");
+      setShowNewCaseModal(false);
+
+      showToast("Case created");
+
+      fetchCases();
+    } catch {
+      showToast("Failed to create case");
+    }
+  };
+
+  const saveNote = async () => {
+    try {
+      if (!selectedCase) return;
+
+      if (!note.trim()) {
+        showToast("Enter note first");
+        return;
+      }
+
+      await api.post(
+        `/cases/${selectedCase._id}/notes`,
+        { text: note },
+        authHeader,
+      );
+
+      setNote("");
+      showToast("Note added");
+      fetchCases();
+    } catch {
+      showToast("Failed to save note");
+    }
+  };
+
+  const scheduleHearing = async () => {
+    try {
+      if (!selectedCase) return;
+
+      if (!scheduleDate || !scheduleTime) {
+        showToast("Choose date & time");
+        return;
+      }
+
+      await api.post(
+        `/cases/${selectedCase._id}/schedule`,
+        {
+          title: "Primary Hearing",
+          date: `${scheduleDate}T${scheduleTime}`,
+        },
+        authHeader,
+      );
+
+      setScheduleDate("");
+      setScheduleTime("");
+
+      showToast("Hearing scheduled");
+      fetchCases();
+    } catch {
+      showToast("Failed to schedule");
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
 
+  const shownCases = showAllCases ? cases : cases.slice(0, 3);
+
+  const totalCases = cases.length;
+
+  const activeCases = cases.filter((item) => item.status === "ready").length;
+
+  const hearingCount = cases.reduce(
+    (count, item) => count + (item.schedule?.length || 0),
+    0,
+  );
+
+  const avgScore =
+    cases.length > 0
+      ? Math.round(
+          cases.reduce((sum, item) => sum + item.viabilityScore, 0) /
+            cases.length,
+        )
+      : 0;
+
+  const quickActions = [
+    {
+      title: "Upload Docs",
+      icon: <UploadCloud size={20} />,
+      action: () => navigate("/upload-case"),
+    },
+    {
+      title: "Add Notes",
+      icon: <FileText size={20} />,
+      action: () =>
+        document
+          .querySelector(".notes-box")
+          ?.scrollIntoView({ behavior: "smooth" }),
+    },
+    {
+      title: "Schedule",
+      icon: <CalendarDays size={20} />,
+      action: () =>
+        document
+          .querySelector(".schedule-grid")
+          ?.scrollIntoView({ behavior: "smooth" }),
+    },
+    {
+      title: "Expenses",
+      icon: <Wallet size={20} />,
+      action: () => navigate("/expense-tracker"),
+    },
+    {
+      title: "Find Advisor",
+      icon: <Users size={20} />,
+      action: () => navigate("/find-advisors"),
+    },
+    {
+      title: "AI Summary",
+      icon: <Sparkles size={20} />,
+      action: () => navigate("/ai-summary"),
+    },
+  ];
+
   return (
-    <div className="dashboard" style={{ maxWidth: "1200px", margin: "0 auto" }}>
-      {/* Header */}
-      <header className="dashboard-header">
-        <div style={{display: 'flex', flex: 1, alignItems: 'center', gap: '1.5rem'}}>
-          <Link to="/dashboard" className="brand" style={{margin: 0}}>
-            <div className="brand-mark">LL</div>
-            <span className="brand-name">
-              Legal<strong>Logic</strong>
-            </span>
-          </Link>
-          <div style={{flex: 1}}>
-            <h1 className="dashboard-title" style={{fontSize: '2rem', margin: '0 0 0.25rem 0'}}>{activeCase.title}</h1>
-            <p className="dashboard-subtitle" style={{margin: 0, fontSize: '1rem'}}>
-              Case #{activeCase.id} • {activeCase.status.toUpperCase()}
-            </p>
-          </div>
-        </div>
-        <button className="logout-btn" onClick={logout}>Logout →</button>
-      </header>
+    <div className="case-page">
+      {toast && <div className="toast-msg">{toast}</div>}
 
-      {/* Case Overview */}
-      <div className="dashboard-grid" style={{ gridTemplateColumns: "2fr 1fr", gap: "2rem", marginBottom: "2rem" }}>
-        <div className="welcome-card">
-          <h2 style={{ marginBottom: "1.5rem" }}>Case Overview</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1.5rem" }}>
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--muted)", fontSize: "0.9rem", marginBottom: "0.5rem" }}>Created</div>
-              <div style={{ fontSize: "1.1rem", fontWeight: "500" }}>{activeCase.created}</div>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--muted)", fontSize: "0.9rem", marginBottom: "0.5rem" }}>Next Hearing</div>
-              <div style={{ fontSize: "1.1rem", fontWeight: "500", color: "var(--gold)" }}>{activeCase.nextHearing}</div>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--muted)", fontSize: "0.9rem", marginBottom: "0.5rem" }}>Advisor</div>
-              <div style={{ fontSize: "1.1rem", fontWeight: "500" }}>{activeCase.advisor}</div>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--muted)", fontSize: "0.9rem", marginBottom: "0.5rem" }}>AI Viability</div>
-              <div style={{ 
-                fontSize: "1.3rem", 
-                color: "var(--green)", 
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem"
-              }}>
-                {activeCase.viability}% <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>Excellent</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div className="dashboard-card">
-            <div className="dashboard-card-icon">📄</div>
-            <h3>{activeCase.documents}</h3>
-            <p>Documents</p>
-          </div>
-          <div className="dashboard-card">
-            <div className="dashboard-card-icon">📝</div>
-            <h3>{activeCase.notesCount}</h3>
-            <p>Notes</p>
-          </div>
-        </div>
-      </div>
+      {/* NEW CASE MODAL */}
+      {showNewCaseModal && (
+        <div className="modal-overlay">
+          <div className="modal-box premium-modal">
+            <div className="modal-head">
+              <h3>Create New Case</h3>
 
-      {/* Quick Actions */}
-      <div className="welcome-card" style={{ marginBottom: "2rem" }}>
-        <h2 style={{ marginBottom: "1.5rem" }}>Quick Actions</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-          {quickActions.map((action, index) => (
-            <button 
-              key={action.action}
-              className="dashboard-card"
-              style={{ 
-                border: "2px solid var(--border)", 
-                textAlign: "left", 
-                cursor: "pointer",
-                position: "relative",
-                background: action.color + "10"
-              }}
-              onClick={() => alert(`Opening ${action.label.toLowerCase()}...`)}
-            >
-              <div className="dashboard-card-icon" style={{ 
-                background: action.color, 
-                width: "48px", 
-                height: "48px", 
-                fontSize: "1.2rem",
-                marginBottom: "0.75rem"
-              }}>
-                {action.icon}
-              </div>
-              <h4 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>{action.label}</h4>
+              <button
+                className="icon-btn"
+                onClick={() => setShowNewCaseModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <textarea
+              className="notes-box"
+              rows="7"
+              placeholder="Describe your issue..."
+              value={newCaseText}
+              onChange={(e) => setNewCaseText(e.target.value)}
+            />
+
+            <button className="btn primary full-btn" onClick={createCase}>
+              Create Case
             </button>
-          ))}
+          </div>
+        </div>
+      )}
+
+      {/* NOTES MODAL */}
+      {showNotesModal && (
+        <div className="modal-overlay">
+          <div className="modal-box premium-modal">
+            <div className="modal-head">
+              <h3>All Notes</h3>
+
+              <button
+                className="icon-btn"
+                onClick={() => setShowNotesModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="popup-scroll">
+              {selectedCase?.notes?.length === 0 ? (
+                <p>No notes yet</p>
+              ) : (
+                selectedCase?.notes?.map((item, index) => (
+                  <div className="note-item" key={index}>
+                    {item.text}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SCHEDULE MODAL */}
+      {showScheduleModal && (
+        <div className="modal-overlay">
+          <div className="modal-box premium-modal">
+            <div className="modal-head">
+              <h3>All Hearings</h3>
+
+              <button
+                className="icon-btn"
+                onClick={() => setShowScheduleModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="popup-scroll">
+              {selectedCase?.schedule?.length === 0 ? (
+                <p>No hearings</p>
+              ) : (
+                selectedCase?.schedule?.map((item, index) => (
+                  <div className="note-item" key={index}>
+                    {item.title} — {new Date(item.date).toLocaleString()}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NAVBAR */}
+      <div className="case-navbar">
+        <div className="brand-logo">
+          Legal<span>Logic</span>
+        </div>
+
+        <div className="nav-actions">
+          <button
+            className="btn secondary"
+            onClick={() => navigate("/dashboard")}
+          >
+            <LayoutDashboard size={18} />
+            Dashboard
+          </button>
+
+          <button className="btn primary" onClick={logout}>
+            <LogOut size={18} />
+            Logout
+          </button>
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="activity-section">
-        <h2 style={{ marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div className="dashboard-card-icon">📅</div> Case Timeline
-        </h2>
-        <div style={{ maxWidth: "1000px" }}>
-          {timeline.map((event, index) => (
-            <div key={event.date} style={{ 
-              display: "flex", 
-              alignItems: "flex-start", 
-              gap: "1.5rem", 
-              padding: "1.5rem 0",
-              borderBottom: index < timeline.length - 1 ? "1px solid var(--border2)" : "none"
-            }}>
-              <div style={{ 
-                minWidth: "60px", 
-                textAlign: "center", 
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "0.85rem",
-                color: "var(--muted)",
-                fontWeight: "500"
-              }}>
-                {event.date}
+      {/* HERO */}
+      <div className="hero-section">
+        <p className="hero-tag">LEGAL WORKSPACE</p>
+        <h1>Case Management</h1>
+        <p className="hero-subtitle">
+          Manage matters, notes, hearings and progress beautifully.
+        </p>
+      </div>
+
+      {/* STATS */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span>Total Cases</span>
+          <h2>{totalCases}</h2>
+        </div>
+
+        <div className="stat-card">
+          <span>Active</span>
+          <h2>{activeCases}</h2>
+        </div>
+
+        <div className="stat-card">
+          <span>Hearings</span>
+          <h2>{hearingCount}</h2>
+        </div>
+
+        <div className="stat-card">
+          <span>Avg Score</span>
+          <h2>{avgScore}%</h2>
+        </div>
+      </div>
+
+      {/* TOP GRID */}
+      <div className="top-grid">
+        {/* CASES */}
+        <div className="glass-card">
+          <div className="section-head">
+            <h3>Your Cases</h3>
+
+            <button
+              className="btn primary"
+              onClick={() => setShowNewCaseModal(true)}
+            >
+              <PlusCircle size={18} />
+              New Case
+            </button>
+          </div>
+
+          {loading ? (
+            <p>Loading...</p>
+          ) : cases.length === 0 ? (
+            <p>No cases yet</p>
+          ) : (
+            <>
+              <div className="case-list-scroll">
+                {shownCases.map((item) => {
+                  const badge = getStatusBadge(item.status);
+
+                  return (
+                    <div
+                      key={item._id}
+                      className={`case-row ${
+                        selectedCase?._id === item._id ? "selected-row" : ""
+                      }`}
+                      onClick={() => handleCaseSelect(item)}
+                    >
+                      <div>
+                        <h4>{item.title}</h4>
+
+                        <p className="case-meta">
+                          {item.caseId}{" "}
+                          <span className={`status-chip ${badge.className}`}>
+                            {badge.icon}
+                            {badge.text}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="row-right">
+                        <strong>{item.viabilityScore}%</strong>
+
+                        <ChevronRight size={18} />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="dashboard-card-icon" style={{ 
-                background: "var(--gold-dim)", 
-                margin: "0.25rem 1rem 0 0",
-                width: "44px",
-                height: "44px",
-                flexShrink: 0
-              }}>
-                {event.icon}
+
+              {cases.length > 3 && (
+                <button
+                  className="view-more-btn"
+                  onClick={() => setShowAllCases(!showAllCases)}
+                >
+                  {showAllCases ? "Show Less" : `View All (${cases.length})`}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* QUICK ACTIONS */}
+        <div className="glass-card">
+          <h3 className="mb-20">Quick Actions</h3>
+
+          <div className="action-grid">
+            {quickActions.map((item, index) => (
+              <button key={index} className="action-card" onClick={item.action}>
+                <div className="action-icon">{item.icon}</div>
+
+                <p>{item.title}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* SELECTED CASE */}
+      {selectedCase && (
+        <>
+          <div ref={selectedRef} className="glass-card selected-case-card">
+            <div className="section-head">
+              <div>
+                <p className="small-label">Selected Case</p>
+
+                <h2>{selectedCase.title}</h2>
+
+                <p className="case-id">{selectedCase.caseId}</p>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: "600", marginBottom: "0.25rem", fontSize: "1.1rem" }}>
-                  {event.event}
-                </div>
-                {event.details && (
-                  <div style={{ color: "var(--muted)", fontSize: "0.95rem" }}>
-                    {event.details}
-                  </div>
+
+              <div className="score-badge">{selectedCase.viabilityScore}%</div>
+            </div>
+
+            <div className="details-grid">
+              <div className="detail-box">
+                <span>Status</span>
+                <strong>{getStatusBadge(selectedCase.status).text}</strong>
+              </div>
+
+              <div className="detail-box">
+                <span>Next</span>
+                <strong>{selectedCase.nextAction}</strong>
+              </div>
+
+              <div className="detail-box">
+                <span>Advisor</span>
+                <strong>{selectedCase.advisor || "Pending"}</strong>
+              </div>
+            </div>
+
+            <div className="progress-wrap">
+              <div className="progress-head">
+                <span>Case Progress</span>
+
+                <span>{getProgress(selectedCase)}%</span>
+              </div>
+
+              <div className="progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{
+                    width: `${getProgress(selectedCase)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* LOWER GRID */}
+          <div className="bottom-grid">
+            {/* TIMELINE */}
+            <div className="glass-card">
+              <h3 className="mb-20">Case Timeline</h3>
+
+              <div className="timeline-modern">
+                {selectedCase.timeline?.length === 0 ? (
+                  <p>No timeline yet</p>
+                ) : (
+                  selectedCase.timeline.map((item, index) => (
+                    <div className="timeline-row" key={index}>
+                      <div className="timeline-date">
+                        {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </div>
+
+                      <div className="timeline-center">
+                        <span className="dot" />
+                      </div>
+
+                      <div className="timeline-body">
+                        <h4>{item.event}</h4>
+                        <p>{item.detail}</p>
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Action Bar */}
-      <div style={{ textAlign: "center", marginTop: "3rem" }}>
-        <Link to="/recent-cases">
-          <button className="logout-btn" style={{ background: "var(--blue)", marginRight: "1rem" }}>
-            📋 All Cases
-          </button>
-        </Link>
-        <Link to="/dashboard">
-          <button className="logout-btn" style={{ background: "var(--muted)" }}>← Dashboard</button>
-        </Link>
-      </div>
+            {/* SIDE */}
+            <div className="side-column">
+              <div className="glass-card">
+                <span className="small-label">AI Viability</span>
+
+                <h2>{selectedCase.viabilityScore}%</h2>
+
+                <p className="purple-text">Smart legal estimate</p>
+              </div>
+
+              {/* NOTES */}
+              <div className="glass-card">
+                <span className="small-label">Quick Notes</span>
+
+                <textarea
+                  className="notes-box"
+                  placeholder="Write note..."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+
+                <div className="dual-btns">
+                  <button
+                    className="btn secondary"
+                    onClick={() => setShowNotesModal(true)}
+                  >
+                    All Notes
+                  </button>
+
+                  <button className="btn primary" onClick={saveNote}>
+                    Save Note
+                  </button>
+                </div>
+              </div>
+
+              {/* SCHEDULE */}
+              <div className="glass-card">
+                <span className="small-label">Schedule Hearing</span>
+
+                <div className="schedule-grid">
+                  <input
+                    type="date"
+                    className="calendar-input"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                  />
+
+                  <input
+                    type="time"
+                    className="calendar-input"
+                    value={scheduleTime}
+                    onChange={(e) => setScheduleTime(e.target.value)}
+                  />
+                </div>
+
+                <div className="dual-btns">
+                  <button
+                    className="btn secondary"
+                    onClick={() => setShowScheduleModal(true)}
+                  >
+                    All Hearings
+                  </button>
+
+                  <button className="btn primary" onClick={scheduleHearing}>
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 export default CaseManagement;
-

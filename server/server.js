@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import mlRoutes from "./routes/ml.js";
 import caseRoutes from "./routes/cases.js";
+import chatRoutes from "./routes/chat.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/ml", mlRoutes);
 app.use("/api/cases", caseRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (req, res) => {
   res.send("LegalLogic API running ⚖️");
